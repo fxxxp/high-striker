@@ -1,0 +1,5 @@
+# Only the page is published. Tests, tools and test/fixtures (decrypted Guild Watch data) stay on this machine.
+/*
+!/index.html
+!/.gitignore
+!/.nojekyll

@@ -1,0 +1,1007 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Luna 1 High Striker</title>
+<meta name="description" content="Pick your guild and your name, swing the hammer, and see where your Guild Conquest score lands.">
+<meta name="robots" content="noindex,nofollow">
+<meta property="og:title" content="Luna 1 High Striker">
+<meta property="og:description" content="Pick your guild, swing the hammer, see where you land.">
+<meta name="theme-color" content="#12153a">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath fill='%23e3ad47' d='M16 4c5.5 0 7.2 4.6 7.5 9.4.2 3.1 1.8 5.1 3.5 6.1V22H5v-2.5c1.7-1 3.3-3 3.5-6.1C8.8 8.6 10.5 4 16 4z'/%3E%3Ccircle cx='16' cy='25.5' r='2.6' fill='%23e3ad47'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@800;900&family=Big+Shoulders+Text:wght@500;600;700&family=Ultra&display=swap">
+<style>
+/* Layout: a fairground booth at night. A striped canopy runs across the top; the marquee sign, the ticket pickers and
+   the verdict sit left of the striker on wide screens and stack around it on phones. Color: Tivoli night blue, warm
+   bulbs, tent red and cream. Neon red, yellow and green belong to the striker's scale alone. */
+:root {
+  --night: #12153a;
+  --night-deep: #0b0d28;
+  --seam: #333a82;
+  --chalk: #fbf3e4;
+  --haze: #aeaedb;
+  --bulb: #ffd36e;
+  --bulb-hot: #fff3c8;
+  --tent: #d8323f;
+  --tent-hi: #e8505b;
+  --tent-deep: #a8212d;
+  --cream: #f3e6cf;
+  --ink: #1a1d4d;
+  --gold: #e7b04a;
+  --gold-deep: #8f6118;
+  --red: #ff4f61;
+  --yellow: #ffc53d;
+  --green: #43e083;
+  --brass: #e3ad47;
+  --brass-hi: #ffe29a;
+  --brass-lo: #94661c;
+  --wood: #c98b4d;
+  --wood-lo: #8b5a2c;
+  --steel: #c9c4e6;
+  --wheel: #272d70;
+  --marquee: "Ultra", "Rockwell Extra Bold", "Roboto Slab", Georgia, serif;
+  --display: "Big Shoulders Display", "Arial Narrow", "Roboto Condensed", Impact, sans-serif;
+  --text: "Big Shoulders Text", "Arial Narrow", "Roboto Condensed", system-ui, sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  background: var(--night);
+  color: var(--chalk);
+  font: 500 18px/1.35 var(--text);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+[hidden] { display: none !important; }
+button { font: inherit; color: inherit; }
+a { color: var(--bulb); text-underline-offset: 3px; }
+:focus-visible { outline: 2px solid var(--bulb); outline-offset: 3px; }
+.sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+
+/* the striped canopy, with a bulb under every scallop */
+.canopy { position: relative; height: 72px; pointer-events: none; }
+.canopy::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 58px;
+  background:
+    linear-gradient(rgb(0 0 0 / .3), rgb(0 0 0 / 0) 50%),
+    repeating-linear-gradient(90deg, var(--tent) 0 44px, var(--cream) 44px 88px);
+  -webkit-mask: linear-gradient(#000 0 0) top / 100% 36px no-repeat, radial-gradient(circle 22px at 50% 0, #000 97%, #0000) 0 36px / 44px 22px repeat-x;
+  mask: linear-gradient(#000 0 0) top / 100% 36px no-repeat, radial-gradient(circle 22px at 50% 0, #000 97%, #0000) 0 36px / 44px 22px repeat-x;
+}
+.canopy::after {
+  content: "";
+  position: absolute;
+  inset: 57px 0 auto;
+  height: 14px;
+  background: radial-gradient(circle 6px at 22px 7px, var(--bulb-hot) 0 2.5px, var(--bulb) 3.5px 4.5px, #0000 5.5px) 0 0 / 44px 14px repeat-x;
+  filter: drop-shadow(0 0 5px var(--bulb));
+}
+
+/* a Ferris wheel turning slowly behind everything */
+.scenery {
+  position: fixed;
+  z-index: -1;
+  right: -8vmin;
+  bottom: -7vmin;
+  width: min(80vmin, 760px);
+  height: auto;
+  opacity: .6;
+  pointer-events: none;
+}
+.spin { transform-box: view-box; transform-origin: 300px 300px; animation: spin 140s linear infinite; }
+.wheel-line { fill: none; stroke: var(--wheel); }
+.wheel-leg { fill: none; stroke: var(--wheel); stroke-width: 12; stroke-linecap: round; }
+.wheel-cab, .wheel-hub { fill: var(--wheel); }
+.wheel-light { fill: var(--bulb); opacity: .45; }
+
+.booth {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding-inline: 16px;
+  padding-block: 2px max(18px, env(safe-area-inset-bottom));
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas: "brand" "pick" "who" "stage" "result" "foot";
+  align-content: start;
+  row-gap: 14px;
+}
+.brand { grid-area: brand; }
+.pick { grid-area: pick; }
+.who { grid-area: who; }
+.stage { grid-area: stage; }
+.result { grid-area: result; }
+.foot { grid-area: foot; }
+.booth[data-mode="guild"] :is(.pick-member, .who, .result),
+.booth[data-mode="member"] :is(.pick-guild, .who, .result),
+.booth[data-mode="play"] .pick { display: none; }
+@media (max-width: 879px) {
+  .booth:not([data-mode="play"]) .stage { display: none; } /* on a phone the striker waits until someone steps up */
+  .booth[data-mode="play"] .marquee { width: min(64%, 300px); }
+}
+@media (min-width: 880px) {
+  .booth {
+    min-height: calc(100% - 72px);
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: auto auto auto 1fr auto;
+    grid-template-areas: "brand stage" "pick stage" "who stage" "result stage" "foot stage";
+    column-gap: 64px;
+    padding-block: 6px 32px;
+  }
+}
+
+/* the marquee sign */
+.marquee { margin: 0; width: min(100%, 470px); }
+.marquee svg { display: block; width: 100%; height: auto; overflow: visible; }
+.board { fill: var(--tent-deep); }
+.board-trim { fill: none; stroke: var(--gold); stroke-width: 3; }
+.marquee-text { font-family: var(--marquee); font-size: 66px; fill: var(--cream); stroke: var(--ink); stroke-width: 8px; stroke-linejoin: round; paint-order: stroke; }
+.marquee-shadow { font-family: var(--marquee); font-size: 66px; fill: var(--gold-deep); }
+.bulbs { filter: drop-shadow(0 0 4px var(--bulb)); }
+.bulb { fill: var(--bulb-hot); }
+.bulb.odd { animation: chase 1.1s steps(1) infinite; }
+.bulb.even { animation: chase 1.1s steps(1) .55s infinite; }
+.eyebrow { margin: 12px 0 0; font: 700 21px/1 var(--text); color: var(--bulb); }
+
+.pick h2 { margin: 16px 0 2px; font: 800 32px/1.1 var(--display); }
+.tickets { display: grid; grid-template-columns: repeat(auto-fill, minmax(106px, 1fr)); gap: 10px; margin-top: 14px; }
+.tickets.wide { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+.note { margin: 14px 0 0; max-width: 38ch; color: var(--haze); font: 600 19px/1.35 var(--text); }
+.pick .ticket.primary { margin-top: 16px; }
+
+/* Guilds, names and the main button are fairground tickets: notched corners, a perforated stub. */
+.ticket {
+  --notch: 7px;
+  --perf: var(--tent);
+  appearance: none;
+  border: 0;
+  cursor: pointer;
+  color: var(--ink);
+  background: linear-gradient(var(--perf) 50%, #0000 0) 9px 0 / 2px 8px repeat-y;
+  background-color: var(--cream);
+  font: 700 17px/1.1 var(--text);
+  padding: 14px 8px 14px 18px;
+  text-align: left;
+  overflow-wrap: anywhere;
+  -webkit-mask:
+    radial-gradient(circle var(--notch) at 0 0, #0000 98%, #000) top left / 51% 51% no-repeat,
+    radial-gradient(circle var(--notch) at 100% 0, #0000 98%, #000) top right / 51% 51% no-repeat,
+    radial-gradient(circle var(--notch) at 0 100%, #0000 98%, #000) bottom left / 51% 51% no-repeat,
+    radial-gradient(circle var(--notch) at 100% 100%, #0000 98%, #000) bottom right / 51% 51% no-repeat;
+  mask:
+    radial-gradient(circle var(--notch) at 0 0, #0000 98%, #000) top left / 51% 51% no-repeat,
+    radial-gradient(circle var(--notch) at 100% 0, #0000 98%, #000) top right / 51% 51% no-repeat,
+    radial-gradient(circle var(--notch) at 0 100%, #0000 98%, #000) bottom left / 51% 51% no-repeat,
+    radial-gradient(circle var(--notch) at 100% 100%, #0000 98%, #000) bottom right / 51% 51% no-repeat;
+  transition: background-color .12s, transform .12s;
+}
+.ticket:hover { background-color: var(--bulb-hot); transform: translateY(-2px); }
+.ticket:focus-visible { outline: none; box-shadow: inset 0 0 0 3px var(--tent); }
+.ticket[data-last] { background-color: var(--bulb); }
+.tickets.wide .ticket { font-size: 20px; padding-block: 16px; }
+.ticket.primary { --perf: var(--cream); background-color: var(--tent); color: var(--cream); font-size: 21px; padding: 15px 24px 15px 28px; }
+.ticket.primary:hover { background-color: var(--tent-hi); }
+.ticket.primary:focus-visible { box-shadow: inset 0 0 0 3px var(--cream); }
+
+.link {
+  appearance: none;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  color: var(--bulb);
+  font: 600 17px/1.2 var(--text);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.who { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; margin: 0; }
+.who-label { color: var(--haze); font-weight: 600; }
+.who strong { font: 900 34px/1 var(--display); }
+
+.stage { display: grid; place-items: center; }
+.tower {
+  appearance: none;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  height: 56vh;
+  height: min(56dvh, 560px);
+  aspect-ratio: 540 / 1000;
+  max-width: 100%;
+  border-radius: 14px;
+  touch-action: manipulation;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--bulb) 10%, transparent), transparent);
+}
+.tower:disabled { cursor: default; }
+.tower svg { display: block; width: 100%; height: 100%; }
+@media (min-width: 880px) { .tower { height: 82vh; height: min(82dvh, 880px); } }
+
+.result { min-width: 0; }
+.hint { margin: 0; color: var(--haze); font: 600 19px/1.3 var(--text); }
+.hint kbd { font: inherit; color: var(--chalk); border: 1px solid var(--seam); border-radius: 4px; padding: 0 6px; }
+.verdict {
+  --zone: var(--chalk);
+  margin: 0;
+  pointer-events: none; /* display only: the big tilted stamp must never swallow a click on the links around it */
+  font: 900 clamp(60px, 13vw, 118px)/.84 var(--display);
+  color: var(--zone);
+  text-shadow: 0 0 22px color-mix(in srgb, var(--zone) 45%, transparent);
+  text-wrap: balance;
+}
+.verdict[data-zone="red"] { --zone: var(--red); }
+.verdict[data-zone="yellow"] { --zone: var(--yellow); }
+.verdict[data-zone="green"] { --zone: var(--green); }
+.verdict.bottom { margin-top: 14px; font-size: clamp(66px, 15vw, 136px); transform: rotate(-3deg); transform-origin: left center; }
+.verdict.enter { animation: rise .28s ease-out both; }
+.verdict.bottom.enter { animation: stamp .26s cubic-bezier(.2, .9, .3, 1.25) both; }
+.basis { margin: 12px 0 0; max-width: 34ch; color: var(--haze); font: 600 18px/1.3 var(--text); }
+.result .ticket { margin-top: 22px; }
+
+.foot { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 18px; color: var(--haze); font: 500 15px/1.4 var(--text); }
+.foot p { margin: 0; }
+
+/* the striker */
+.stripe-red { fill: var(--tent); }
+.stripe-cream { fill: var(--cream); }
+.pole-edge { fill: none; stroke: var(--night-deep); stroke-width: 2; opacity: .7; }
+.rail { stroke: var(--night-deep); stroke-width: 4; opacity: .5; }
+.ring { fill: var(--gold); }
+.tb { --zone: var(--chalk); }
+.tb.red { --zone: var(--red); }
+.tb.yellow { --zone: var(--yellow); }
+.tb.green { --zone: var(--green); }
+.tb .glass { fill: var(--zone); opacity: .22; }
+.tb .halo { opacity: 0; }
+.tb.on .glass { opacity: 1; }
+.tb.on .halo { opacity: 1; }
+.h-red { stop-color: var(--red); stop-opacity: .55; }
+.h-yellow { stop-color: var(--yellow); stop-opacity: .55; }
+.h-green { stop-color: var(--green); stop-opacity: .55; }
+.h-out { stop-opacity: 0; }
+.sign { font-family: var(--display); font-weight: 900; text-anchor: end; }
+.sign[data-zone="red"] { --zone: var(--red); }
+.sign[data-zone="yellow"] { --zone: var(--yellow); }
+.sign[data-zone="green"] { --zone: var(--green); }
+.sign text { fill: var(--zone); opacity: .32; }
+.sign.on text { opacity: 1; filter: url(#glow); animation: neon .45s steps(1) both; }
+.bell { transform-box: view-box; transform-origin: 280px 30px; }
+.bell.ring { animation: ring 1.1s cubic-bezier(.3, .6, .4, 1) both; }
+.bell-body { fill: var(--brass); }
+.bell-shine { fill: var(--brass-hi); opacity: .75; }
+.bell-dark { fill: var(--brass-lo); }
+.ding { fill: none; stroke: var(--brass-hi); stroke-width: 4; opacity: 0; transform-box: fill-box; transform-origin: center; }
+.ding.go { animation: ding .8s ease-out both; }
+.puck { --zone: var(--bulb); }
+.puck-glow { fill: var(--zone); opacity: 0; transition: opacity .25s; }
+.puck.lit .puck-glow { opacity: .75; }
+.puck-disc { fill: var(--cream); stroke: var(--ink); stroke-width: 4; }
+.puck-dot { fill: var(--gold); }
+.floor { fill: var(--night-deep); }
+.plinth { fill: var(--tent-deep); }
+.plinth-trim { fill: var(--gold); }
+.lever { fill: var(--steel); }
+.pad { fill: var(--cream); }
+.pad-stripe { fill: var(--tent); }
+.handle { fill: var(--wood-lo); }
+.grip { fill: var(--night-deep); }
+.head { fill: var(--wood); }
+.band { fill: var(--steel); }
+
+.shake { animation: shake .3s linear; }
+.shake-big { animation: shake .5s linear 2; }
+@keyframes shake {
+  0%, 100% { transform: translate(0, 0); }
+  20% { transform: translate(-5px, 2px); }
+  40% { transform: translate(4px, -3px); }
+  60% { transform: translate(-3px, 2px); }
+  80% { transform: translate(2px, -1px); }
+}
+@keyframes rise { from { transform: translateY(14px); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes stamp {
+  0% { transform: scale(1.9) rotate(-8deg); opacity: 0; }
+  60% { opacity: 1; }
+  100% { transform: scale(1) rotate(-3deg); opacity: 1; }
+}
+@keyframes neon { 0% { opacity: .32; } 20% { opacity: 1; } 35% { opacity: .45; } 55% { opacity: 1; } 70% { opacity: .7; } 100% { opacity: 1; } }
+@keyframes ring {
+  0% { transform: rotate(0); } 12% { transform: rotate(12deg); } 28% { transform: rotate(-9deg); }
+  44% { transform: rotate(6deg); } 60% { transform: rotate(-4deg); } 76% { transform: rotate(2deg); } 100% { transform: rotate(0); }
+}
+@keyframes ding { 0% { opacity: .9; transform: scale(.4); } 100% { opacity: 0; transform: scale(1.6); } }
+@keyframes chase { 0% { opacity: 1; } 50% { opacity: .3; } 100% { opacity: .3; } }
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .shake, .shake-big, .verdict.enter, .verdict.bottom.enter, .sign.on text, .bell.ring, .ding.go, .bulb.odd, .bulb.even, .spin { animation: none !important; }
+}
+</style>
+
+<script id="gh-logic">
+/* Data logic, kept apart from the page so test/logic.test.mjs can run it in Node.
+   Reads Guild Watch's own data and turns it into one verdict per member. The peer check copies Guild Watch's:
+   the players of your class nearest your CP on every server (mapleidle.gg's list), scaled to your CP at that run. */
+(function (root) {
+  "use strict";
+  const MIN_CP = 1e14; // Guild Watch drops players below this CP
+  const MINPEERS = 6; // with fewer peers than this, fall back to Luna 1 players near your CP
+  const SAY = { bottom: "You hit like a girl", red: "Ur shit", yellow: "Ur average", green: "Ur good" };
+
+  const bytes = (b64) => Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
+
+  async function fileHash(salt, name) {
+    const d = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(salt + ":" + name));
+    return Array.from(new Uint8Array(d), (x) => x.toString(16).padStart(2, "0")).join("").slice(0, 20);
+  }
+
+  // Guild Watch ships its page and data AES-GCM sealed, with the key in the page itself.
+  function readBundle(html) {
+    const m = String(html).match(/\bB=(\{[^{}]*\})/);
+    if (!m) return null;
+    try {
+      const b = JSON.parse(m[1]);
+      return b.n && b.k ? { n: b.n, k: b.k } : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  async function decrypt(keyB64, box) {
+    const key = await crypto.subtle.importKey("raw", bytes(keyB64), "AES-GCM", false, ["decrypt"]);
+    const plain = await crypto.subtle.decrypt({ name: "AES-GCM", iv: bytes(box.iv) }, key, bytes(box.ct));
+    return new TextDecoder().decode(plain);
+  }
+
+  // Slope of log(score) against log(CP), fitted the way Guild Watch does; scales each peer's score to your CP.
+  function fitSlope(rows) {
+    const xs = rows.map((p) => Math.log10(p.cp)), ys = rows.map((p) => Math.log10(p.cq));
+    const n = xs.length, mx = xs.reduce((s, x) => s + x, 0) / n, my = ys.reduce((s, y) => s + y, 0) / n;
+    let sxy = 0, sxx = 0;
+    for (let i = 0; i < n; i++) { sxy += (xs[i] - mx) * (ys[i] - my); sxx += (xs[i] - mx) ** 2; }
+    return sxy / sxx;
+  }
+
+  // Who you're measured against: mapleidle.gg's players of your class nearest your CP, all servers. Without that
+  // list, Guild Watch's fallback: your class within 20% CP (widened to 35%, then 50%), then any class, then the 12 closest.
+  function peersOf(p, pool, site, b) {
+    const e = site && site[p.id] && site[p.id].cq;
+    if (e && e.p && e.p.length >= MINPEERS && e.c > 0 && p.cq > 0) {
+      const v = e.p.filter((x) => x[0] > 0 && x[1] > 0).map((x) => x[1] * Math.pow(e.c / x[0], b));
+      return { v, basis: { kind: "site", job: p.job } };
+    }
+    const band = (w, sameJob) => pool.filter((q) => q.id !== p.id && (!sameJob || q.job === p.job) && q.cp >= p.cp * (1 - w) && q.cp <= p.cp * (1 + w));
+    let co = [];
+    for (const w of [0.2, 0.35, 0.5]) { co = band(w, true); if (co.length >= MINPEERS) break; }
+    let basis = { kind: "class", job: p.job };
+    if (co.length < MINPEERS) {
+      basis = { kind: "any" };
+      co = band(0.2, false);
+      if (co.length < MINPEERS) {
+        const gap = (q) => Math.abs(Math.log(q.cp / p.cp));
+        co = pool.filter((q) => q.id !== p.id).sort((a, c) => gap(a) - gap(c)).slice(0, 12);
+      }
+    }
+    return { v: co.map((q) => q.cq).filter((x) => x > 0), basis };
+  }
+
+  // Guild Watch's peer quarters: vp = (place - 1) / (players - 1), 0 = best. Top quarter (vp <= .25) is good, bottom (vp >= .75) bad.
+  const vpOf = (r, n) => (r - 1) / Math.max(1, n - 1);
+  function zoneOf(r, n) {
+    const vp = vpOf(r, n);
+    return vp <= 0.25 ? "green" : vp >= 0.75 ? "red" : "yellow";
+  }
+
+  // Where the puck stops: 0 is the bottom of the scale, 1 the bell. Held a hair inside its zone so it never sits on a line.
+  function heightOf(r, n) {
+    const h = 1 - vpOf(r, n), z = zoneOf(r, n), inset = 0.02;
+    if (z === "green") return Math.max(h, 0.75 + inset);
+    if (z === "red") return Math.min(h, 0.25 - inset);
+    return Math.min(Math.max(h, 0.25 + inset), 0.75 - inset);
+  }
+
+  // Guild Watch writes guild names as they are in game, except its own home guild.
+  const NAMES = { RoyalBunny: "Royal Bunny" };
+  const guildName = (key) => NAMES[key] || key;
+
+  const poolOf = (sn) => sn.p.filter((r) => r[5] >= MIN_CP)
+    .map((r) => ({ id: r[0], g: sn.guilds[r[1]].n, name: r[2], job: sn.jobs[r[3]], cp: r[5], cq: r[8] }));
+
+  // A guild's members, each measured the way Guild Watch measures them with that guild set as home.
+  function membersOf(index, sn, pool, guild) {
+    const tracked = [guild].concat((index.rivals || []).filter((g) => g !== guild));
+    const slope = fitSlope(pool.filter((p) => tracked.includes(p.g) && p.cq > 0));
+    const b = Number.isFinite(slope) ? slope : 1;
+    const members = pool.filter((p) => p.g === guild).map((p) => {
+      const { v, basis } = peersOf(p, pool, sn.peers, b);
+      const noRun = !(p.cq > 0);
+      const place = !noRun && v.length ? { r: 1 + v.filter((x) => x > p.cq).length, n: v.length + 1 } : null;
+      const zone = place ? zoneOf(place.r, place.n) : noRun ? "red" : "yellow";
+      const height = place ? Math.round(heightOf(place.r, place.n) * 1e4) / 1e4 : noRun ? 0 : 0.5;
+      const bottom = noRun || (!!place && place.r === place.n);
+      const bell = !!place && place.r === 1;
+      return { name: p.name, job: p.job, zone, height, place, noRun, bottom, bell, basis, verdict: bottom ? SAY.bottom : SAY[zone] };
+    });
+    return members.sort((a, c) => a.name.localeCompare(c.name, "en", { sensitivity: "base" }));
+  }
+
+  function guildResults(index, sn, guild = index.home) {
+    return { guild: guildName(guild), key: guild, server: index.server, asOf: sn.date, members: membersOf(index, sn, poolOf(sn), guild) };
+  }
+
+  // Every guild on the server, in server rank order.
+  function serverResults(index, sn) {
+    const pool = poolOf(sn);
+    const guilds = sn.guilds
+      .filter((g) => pool.some((p) => p.g === g.n))
+      .sort((a, c) => (a.rank || 99) - (c.rank || 99))
+      .map((g) => ({ key: g.n, name: guildName(g.n), rank: g.rank, members: membersOf(index, sn, pool, g.n) }));
+    return { server: index.server, asOf: sn.date, home: index.home, guilds };
+  }
+
+  function plural(job) {
+    if (/man$/.test(job)) return job.slice(0, -3) + "men";
+    if (/o$/.test(job)) return job + "es";
+    return job + "s";
+  }
+
+  // The small line under the verdict: who you were measured against.
+  function basisLine(m, server) {
+    if (m.noRun) return "No Guild Conquest run on record this week";
+    const where = String(server || "").replace(/-/g, " ").replace(/\b[a-z]/g, (c) => c.toUpperCase());
+    if (m.basis.kind === "site") return `Guild Conquest vs. ${plural(m.basis.job)} nearest your CP, all servers`;
+    if (m.basis.kind === "class") return `Guild Conquest vs. ${plural(m.basis.job)} near your CP on ${where}`;
+    return `Guild Conquest vs. players near your CP on ${where}`;
+  }
+
+  async function loadLive(base) {
+    const get = async (url, how) => {
+      const r = await fetch(url, { cache: "no-cache" });
+      if (!r.ok) throw new Error(url + " answered " + r.status);
+      return how === "text" ? r.text() : r.json();
+    };
+    const bundle = readBundle(await get(base, "text"));
+    if (!bundle) throw new Error("Guild Watch's page has changed shape");
+    const open = async (name) => JSON.parse(await decrypt(bundle.k, await get(base + "d/" + (await fileHash(bundle.n, name)) + ".json")));
+    const index = await open("index");
+    const latest = index.dates.slice().sort().pop();
+    return serverResults(index, await open(latest));
+  }
+
+  const SOURCE = "https://thepiffles.github.io/guild-watch-site/";
+  root.GH = { fileHash, readBundle, decrypt, zoneOf, heightOf, guildResults, serverResults, basisLine, loadLive, SAY, SOURCE };
+})(globalThis);
+</script>
+</head>
+<body>
+<div class="canopy" aria-hidden="true"></div>
+<svg class="scenery" viewBox="0 0 600 640" aria-hidden="true" focusable="false">
+  <path class="wheel-leg" d="M300 300L176 634M300 300L424 634"/>
+  <g class="spin">
+    <circle class="wheel-line" cx="300" cy="300" r="270" stroke-width="10"/>
+    <circle class="wheel-line" cx="300" cy="300" r="244" stroke-width="4"/>
+    <g id="wheel-parts"></g>
+  </g>
+  <circle class="wheel-hub" cx="300" cy="300" r="20"/>
+</svg>
+
+<main id="booth" class="booth" data-mode="guild">
+  <header class="brand">
+    <h1 class="marquee">
+      <span class="sr-only">High Striker</span>
+      <svg viewBox="0 0 640 200" aria-hidden="true" focusable="false">
+        <rect class="board" width="640" height="200" rx="24"/>
+        <rect class="board-trim" x="36" y="36" width="568" height="128" rx="10"/>
+        <g id="marquee-bulbs" class="bulbs"></g>
+        <text class="marquee-shadow" x="320" y="128" text-anchor="middle">High Striker</text>
+        <text class="marquee-text" x="320" y="122" text-anchor="middle">High Striker</text>
+      </svg>
+    </h1>
+    <p class="eyebrow" id="eyebrow">Luna 1</p>
+  </header>
+
+  <section class="pick pick-guild" aria-labelledby="guild-title">
+    <h2 id="guild-title">Choose your guild</h2>
+    <p id="load-note" class="note" role="status">Loading this week's scores from Guild Watch…</p>
+    <button id="retry" class="ticket primary" type="button" hidden>Try again</button>
+    <div id="guilds" class="tickets wide"></div>
+  </section>
+
+  <section class="pick pick-member" aria-labelledby="member-title">
+    <h2 id="member-title">Who's swinging?</h2>
+    <button id="change-guild" class="link" type="button">Pick another guild</button>
+    <div id="names" class="tickets"></div>
+  </section>
+
+  <p class="who"><span class="who-label">Swinging</span> <strong id="who-name"></strong> <button id="change" class="link" type="button">Not you?</button></p>
+
+  <div class="stage" id="stage">
+    <button id="swing" class="tower" type="button" aria-label="Swing the hammer" disabled>
+      <svg viewBox="0 0 540 1000" aria-hidden="true" focusable="false">
+        <defs>
+          <filter id="glow" x="-30%" y="-80%" width="160%" height="260%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="7" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+          <filter id="soft" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="9"/></filter>
+          <pattern id="barber" width="30" height="30" patternUnits="userSpaceOnUse" patternTransform="rotate(-38)">
+            <rect class="stripe-cream" width="30" height="30"/>
+            <rect class="stripe-red" width="15" height="30"/>
+          </pattern>
+          <radialGradient id="halo-red"><stop offset="0" class="h-red"/><stop offset="1" class="h-red h-out"/></radialGradient>
+          <radialGradient id="halo-yellow"><stop offset="0" class="h-yellow"/><stop offset="1" class="h-yellow h-out"/></radialGradient>
+          <radialGradient id="halo-green"><stop offset="0" class="h-green"/><stop offset="1" class="h-green h-out"/></radialGradient>
+        </defs>
+
+        <rect x="266" y="118" width="28" height="818" rx="14" fill="url(#barber)"/>
+        <rect class="pole-edge" x="266" y="118" width="28" height="818" rx="14"/>
+        <line class="rail" x1="280" y1="134" x2="280" y2="914"/>
+        <rect class="ring" x="260" y="678" width="40" height="9" rx="3"/>
+        <rect class="ring" x="260" y="323" width="40" height="9" rx="3"/>
+        <!-- two columns of bulbs mark the scale and light from the bottom up to the puck -->
+        <g id="tower-bulbs"></g>
+
+        <!-- the ratings, painted down the board like a real striker -->
+        <g class="sign" id="sign-green" data-zone="green"><text x="226" y="258" font-size="52">Ur good</text></g>
+        <g class="sign" id="sign-yellow" data-zone="yellow"><text x="226" y="525" font-size="52">Ur average</text></g>
+        <g class="sign" id="sign-red" data-zone="red"><text x="226" y="760" font-size="52">Ur shit</text></g>
+        <g class="sign" id="sign-bottom" data-zone="red"><text x="226" y="852" font-size="34">You hit</text><text x="226" y="886" font-size="34">like a girl</text></g>
+
+        <g id="bell" class="bell">
+          <rect class="bell-dark" x="266" y="22" width="28" height="14" rx="4"/>
+          <path class="bell-body" d="M280 32c-33 0-42 27-44 54-1 13-9 21-18 26h124c-9-5-17-13-18-26-2-27-11-54-44-54z"/>
+          <path class="bell-shine" d="M262 50c-8 9-11 23-12 37-1 10-4 16-8 21h9c3-5 6-11 7-21 1-14 3-28 9-37z"/>
+          <rect class="bell-dark" x="212" y="108" width="136" height="10" rx="5"/>
+          <circle class="bell-dark" cx="280" cy="126" r="8"/>
+        </g>
+        <circle id="ding" class="ding" cx="280" cy="76" r="74"/>
+
+        <ellipse class="floor" cx="312" cy="978" rx="176" ry="10"/>
+        <path class="plinth" d="M188 936h264l18 36H170z"/>
+        <rect class="plinth-trim" x="186" y="932" width="268" height="6" rx="3"/>
+        <path class="lever" d="M309 932l7-6 7 6z"/>
+        <g id="lever">
+          <rect class="lever" x="258" y="922" width="142" height="9" rx="4"/>
+          <rect class="pad" x="334" y="908" width="62" height="15" rx="4"/>
+          <rect class="pad-stripe" x="358" y="908" width="14" height="15"/>
+        </g>
+
+        <g id="puck" class="puck" transform="translate(280 905)">
+          <circle class="puck-glow" r="26" filter="url(#soft)"/>
+          <circle class="puck-disc" r="16"/>
+          <circle class="puck-dot" r="5"/>
+        </g>
+
+        <!-- the mallet, swung from off to the right; it turns around the end of its handle -->
+        <g id="mallet" transform="rotate(-30 526 862)">
+          <rect class="handle" x="520" y="716" width="12" height="162" rx="6"/>
+          <rect class="grip" x="518" y="826" width="16" height="48" rx="6"/>
+          <rect class="head" x="480" y="674" width="92" height="48" rx="9"/>
+          <rect class="band" x="489" y="674" width="8" height="48"/>
+          <rect class="band" x="555" y="674" width="8" height="48"/>
+        </g>
+      </svg>
+    </button>
+  </div>
+
+  <div class="result">
+    <p id="hint" class="hint"></p>
+    <div aria-live="polite">
+      <p id="verdict" class="verdict" hidden></p>
+      <p id="basis" class="basis" hidden></p>
+    </div>
+    <button id="again" class="ticket primary" type="button" hidden>Swing again</button>
+  </div>
+
+  <footer class="foot">
+    <button id="sound" class="link" type="button" aria-pressed="true">Sound on</button>
+    <p id="source">Loading this week's scores…</p>
+  </footer>
+</main>
+
+<script>
+/* The booth: choosing a guild and a name, the swing, and the reveal. All the scoring lives in GH (the gh-logic block). */
+(function () {
+  "use strict";
+  const $ = (id) => document.getElementById(id);
+  const booth = $("booth"), stage = $("stage"), eyebrow = $("eyebrow"), guildsEl = $("guilds"), namesEl = $("names");
+  const whoEl = $("who-name"), tower = $("swing"), hintEl = $("hint"), verdictEl = $("verdict"), basisEl = $("basis");
+  const againBtn = $("again"), soundBtn = $("sound"), sourceEl = $("source"), loadNote = $("load-note"), retryBtn = $("retry");
+  const puck = $("puck"), mallet = $("mallet"), lever = $("lever"), bell = $("bell"), ding = $("ding");
+  const signs = { green: $("sign-green"), yellow: $("sign-yellow"), red: $("sign-red"), bottom: $("sign-bottom") };
+  const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem("highstriker:" + k); return v == null ? d : v; } catch (e) { return d; } },
+    set(k, v) { try { localStorage.setItem("highstriker:" + k, v); } catch (e) {} },
+  };
+  const svg = (tag, attrs) => {
+    const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+    for (const k in attrs) el.setAttribute(k, attrs[k]);
+    return el;
+  };
+
+  // ---------- sound: all synthesized, nothing to download ----------
+  const sound = (() => {
+    let ac = null, on = store.get("sound", "1") === "1";
+    function ctx() {
+      if (!ac) {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (!AC) return null;
+        try { ac = new AC(); } catch (e) { return null; }
+      }
+      if (ac.state === "suspended") ac.resume();
+      return ac;
+    }
+    function tone({ type = "sine", f0, f1 = f0, dur, gain = 0.2, at = 0, lp = 0 }) {
+      const c = on && ctx();
+      if (!c) return;
+      const t = c.currentTime + at, o = c.createOscillator(), g = c.createGain();
+      o.type = type;
+      o.frequency.setValueAtTime(f0, t);
+      if (f1 !== f0) o.frequency.exponentialRampToValueAtTime(f1, t + dur);
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(gain, t + 0.012);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      let out = o;
+      if (lp) { const f = c.createBiquadFilter(); f.type = "lowpass"; f.frequency.value = lp; o.connect(f); out = f; }
+      out.connect(g);
+      g.connect(c.destination);
+      o.start(t);
+      o.stop(t + dur + 0.05);
+    }
+    function noise({ dur, gain = 0.3, freq = 1000, q = 1, at = 0 }) {
+      const c = on && ctx();
+      if (!c) return;
+      const n = Math.max(1, Math.floor(c.sampleRate * dur)), buf = c.createBuffer(1, n, c.sampleRate), d = buf.getChannelData(0);
+      for (let i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / n) * (1 - i / n);
+      const s = c.createBufferSource(), f = c.createBiquadFilter(), g = c.createGain();
+      s.buffer = buf;
+      f.type = "bandpass"; f.frequency.value = freq; f.Q.value = q;
+      g.gain.value = gain;
+      s.connect(f); f.connect(g); g.connect(c.destination);
+      s.start(c.currentTime + at);
+    }
+    return {
+      get on() { return on; },
+      set on(v) { on = v; store.set("sound", v ? "1" : "0"); },
+      wake() { if (on) ctx(); },
+      whoosh() { noise({ dur: 0.16, gain: 0.45, freq: 700, q: 0.7 }); },
+      thud() { tone({ f0: 150, f1: 42, dur: 0.24, gain: 0.9 }); noise({ dur: 0.06, gain: 0.5, freq: 2600, q: 0.8 }); },
+      zip(sec) { tone({ type: "triangle", f0: 170, f1: 170 + 800 * Math.min(1, sec / 1.1), dur: Math.max(0.12, sec), gain: 0.06 }); },
+      clack() { noise({ dur: 0.035, gain: 0.6, freq: 3400, q: 2 }); },
+      bell() { [[1, 0.4, 2.4], [2, 0.18, 1.6], [2.76, 0.13, 1.1], [5.4, 0.05, 0.5]].forEach(([m, g, d]) => tone({ f0: 784 * m, dur: d, gain: g })); },
+      good() { [1047, 1319, 1568].forEach((f, i) => tone({ type: "triangle", f0: f, dur: 0.16, gain: 0.12, at: 0.05 + i * 0.08 })); },
+      meh() { tone({ type: "triangle", f0: 523, dur: 0.16, gain: 0.1, at: 0.05 }); tone({ type: "triangle", f0: 523, dur: 0.2, gain: 0.08, at: 0.24 }); },
+      bad() { tone({ type: "square", f0: 116, f1: 98, dur: 0.45, gain: 0.08, lp: 900, at: 0.05 }); },
+      flop() {
+        let at = 0.1;
+        [[392, 0.3], [370, 0.3], [349, 0.3], [330, 0.95]].forEach(([f, d], i) => {
+          tone({ type: "sawtooth", f0: f, f1: i === 3 ? f * 0.84 : f, dur: d, gain: 0.11, lp: 1100, at });
+          at += d + 0.05;
+        });
+      },
+    };
+  })();
+
+  // ---------- data: this week's, read from Guild Watch on every visit; the page itself stores none ----------
+  let data = null;
+  const serverName = () => (data ? String(data.server).replace(/-/g, " ").replace(/\b[a-z]/g, (c) => c.toUpperCase()) : "");
+  const guildOf = (key) => (data && data.guilds.find((g) => g.key === key)) || null;
+  const memberOf = (key, name) => { const g = guildOf(key); return (g && g.members.find((m) => m.name === name)) || null; };
+  const guildWith = (name) => (data && data.guilds.find((g) => g.members.some((m) => m.name === name))) || null;
+  const day = (d) => new Date(d + "T00:00:00").toLocaleDateString("en", { month: "short", day: "numeric" });
+  function showSource(before, after) {
+    const a = document.createElement("a");
+    a.href = GH.SOURCE;
+    a.textContent = "Guild Watch";
+    sourceEl.replaceChildren(before, a, after);
+  }
+  function load() {
+    loadNote.textContent = "Loading this week's scores from Guild Watch…";
+    retryBtn.hidden = true;
+    const tooSlow = new Promise((_, fail) => setTimeout(() => fail(new Error("Guild Watch took too long")), 15000));
+    return Promise.race([GH.loadLive(GH.SOURCE), tooSlow]).then(
+      (res) => {
+        data = res;
+        loadNote.hidden = true;
+        showSource("Scores from ", `, week of ${day(data.asOf)}`);
+        if (!route()) showGuilds();
+      },
+      () => {
+        loadNote.textContent = "Couldn't reach Guild Watch, so there are no scores to swing at yet. Check your connection and try again.";
+        retryBtn.hidden = false;
+        showSource("Scores come from ", "");
+      });
+  }
+
+  // ---------- choosing a guild, then a name ----------
+  let guild = null, current = null;
+  function ticket(label, last, pick) {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "ticket";
+    b.textContent = label;
+    if (last) { b.dataset.last = ""; b.title = "Your last pick"; }
+    b.addEventListener("click", pick);
+    return b;
+  }
+  function renderGuilds() {
+    const last = store.get("guild", "");
+    guildsEl.replaceChildren(...data.guilds.map((g) => ticket(g.name, g.key === last, () => chooseGuild(g.key))));
+  }
+  function renderMembers() {
+    const g = guildOf(guild), last = store.get("name", "");
+    namesEl.replaceChildren(...(g ? g.members : []).map((m) => ticket(m.name, m.name === last, () => choose(m.name))));
+  }
+  function setUrl() {
+    try {
+      const u = new URL(location.href);
+      u.searchParams.delete("guild");
+      u.searchParams.delete("name");
+      if (guild) u.searchParams.set("guild", guild);
+      if (current) u.searchParams.set("name", current);
+      history.replaceState(null, "", u);
+    } catch (e) {}
+  }
+  function enter(mode) {
+    booth.dataset.mode = mode;
+    tower.disabled = mode !== "play";
+    setUrl();
+    window.scrollTo(0, 0);
+  }
+  function showGuilds() {
+    stopSwing();
+    guild = current = null;
+    eyebrow.textContent = serverName();
+    renderGuilds();
+    resetStage();
+    enter("guild");
+  }
+  function chooseGuild(key) {
+    stopSwing();
+    guild = key;
+    current = null;
+    store.set("guild", key);
+    eyebrow.textContent = guildOf(key).name;
+    renderMembers();
+    resetStage();
+    enter("member");
+  }
+  function choose(name) {
+    stopSwing();
+    current = name;
+    store.set("name", name);
+    whoEl.textContent = name;
+    resetStage();
+    enter("play");
+  }
+
+  // ---------- the striker ----------
+  const REST = 905, FLOOR = 860, TOP = 150; // puck centre: on the lever, on the scale's bottom line, under the bell
+  const A_REST = -30, A_BACK = -14, A_HIT = -90; // mallet angles around the end of its handle
+  const G = 1150; // gravity in scale units per second², so a climb to the bell takes about 1.1 s
+  const yOf = (h) => FLOOR - h * (FLOOR - TOP);
+  const lamps = [];
+  let puckY = REST, busy = false, run = 0;
+
+  // Picking a new guild or name mid-swing bumps the run, which stops every step of the old swing.
+  function stopSwing() {
+    run++;
+    busy = false;
+    tower.removeAttribute("aria-busy");
+  }
+
+  function setPuck(y) {
+    puckY = y;
+    puck.setAttribute("transform", `translate(280 ${y.toFixed(1)})`);
+    for (const l of lamps) {
+      const on = l.y >= y;
+      if (on !== l.on) { l.on = on; l.el.classList.toggle("on", on); }
+    }
+  }
+  const setMallet = (a) => mallet.setAttribute("transform", `rotate(${a.toFixed(2)} 526 862)`);
+  const setLever = (a) => lever.setAttribute("transform", `rotate(${a.toFixed(2)} 316 931)`);
+  // Resolves true when it finishes, false if a new run stopped it.
+  const tween = (ms, draw) => new Promise((done) => {
+    const my = run, t0 = performance.now();
+    const step = (now) => {
+      if (my !== run) return done(false);
+      const k = Math.min(1, (now - t0) / ms);
+      draw(k);
+      if (k < 1) requestAnimationFrame(step); else done(true);
+    };
+    requestAnimationFrame(step);
+  });
+  const easeOut = (k) => 1 - (1 - k) * (1 - k);
+  const easeIn = (k) => k * k;
+  const easeOutBack = (k) => 1 + 2.7 * Math.pow(k - 1, 3) + 1.7 * Math.pow(k - 1, 2);
+  const replay = (el, cls) => { el.classList.remove(cls); void el.getBoundingClientRect(); el.classList.add(cls); };
+  const lightSign = (key) => Object.entries(signs).forEach(([k, el]) => el.classList.toggle("on", k === key));
+  function shake(el, cls) {
+    if (reduced) return;
+    el.classList.remove("shake", "shake-big");
+    void el.offsetWidth;
+    el.classList.add(cls);
+  }
+
+  function clearResult() {
+    lightSign(null);
+    puck.classList.remove("lit");
+    verdictEl.hidden = basisEl.hidden = againBtn.hidden = true;
+    verdictEl.className = "verdict";
+  }
+  function resetStage() {
+    clearResult();
+    setPuck(REST);
+    setMallet(A_REST);
+    setLever(0);
+    hintEl.hidden = false;
+  }
+
+  async function swing() {
+    if (busy || !current) return;
+    busy = true;
+    tower.setAttribute("aria-busy", "true");
+    sound.wake();
+    clearResult();
+    hintEl.hidden = true;
+    if (puckY < REST) {
+      const from = puckY;
+      if (!(await tween(reduced ? 120 : 300, (k) => setPuck(from + (REST - from) * easeIn(k))))) return;
+    }
+    const m = memberOf(guild, current);
+    if (!m) { chooseGuild(guild); return; }
+
+    if (!(await tween(reduced ? 60 : 150, (k) => setMallet(A_REST + (A_BACK - A_REST) * easeOut(k))))) return;
+    sound.whoosh();
+    if (!(await tween(reduced ? 60 : 100, (k) => setMallet(A_BACK + (A_HIT - A_BACK) * easeIn(k))))) return;
+    sound.thud();
+    setLever(7);
+    shake(stage, "shake");
+    tween(reduced ? 80 : 460, (k) => setMallet(A_HIT + (A_REST - A_HIT) * easeOutBack(k)));
+    tween(200, (k) => setLever(7 * (1 - k)));
+
+    if (!(await (m.noRun ? whiff() : fly(m)))) return;
+    reveal(m);
+    busy = false;
+    tower.removeAttribute("aria-busy");
+  }
+
+  // Both resolve true when the puck has come to rest, false if a new run stopped them.
+  async function fly(m) {
+    const target = yOf(m.height), D = REST - target;
+    if (reduced) {
+      if (!(await tween(260, (k) => setPuck(REST - D * easeOut(k))))) return false;
+      if (m.bell) ringBell();
+    } else if (m.bell) {
+      // aimed past the bell so it arrives with speed to spare
+      const Dv = D + 170, Tv = Math.sqrt((2 * Dv) / G), tHit = Tv * (1 - Math.sqrt(1 - D / Dv));
+      sound.zip(tHit);
+      if (!(await tween(tHit * 1000, (k) => setPuck(REST - Dv * easeOut((k * tHit) / Tv))))) return false;
+      ringBell();
+      if (!(await tween(420, (k) => setPuck(target + 28 * Math.sin(Math.PI * k) * (1 - k))))) return false;
+    } else {
+      const T = Math.sqrt((2 * D) / G);
+      sound.zip(T);
+      if (!(await tween(T * 1000, (k) => setPuck(REST - D * easeOut(k))))) return false;
+      sound.clack();
+      if (!(await tween(140, (k) => setPuck(target + 6 * Math.sin(Math.PI * k))))) return false; // the catch holds it there
+    }
+    setPuck(target);
+    return true;
+  }
+  async function whiff() {
+    // no run on record: the lever kicks and the puck only rattles
+    if (!(await tween(reduced ? 100 : 260, (k) => setPuck(REST - 5 * Math.abs(Math.sin(Math.PI * 3 * k)) * (1 - k))))) return false;
+    setPuck(REST);
+    return true;
+  }
+  function ringBell() {
+    sound.bell();
+    replay(bell, "ring");
+    replay(ding, "go");
+  }
+
+  function reveal(m) {
+    lightSign(m.bottom ? "bottom" : m.zone);
+    puck.style.setProperty("--zone", `var(--${m.zone})`);
+    puck.classList.add("lit");
+    verdictEl.textContent = m.verdict;
+    verdictEl.dataset.zone = m.zone;
+    verdictEl.classList.toggle("bottom", m.bottom);
+    verdictEl.hidden = false;
+    replay(verdictEl, "enter");
+    basisEl.textContent = (m.bell ? "Rang the bell. " : "") + GH.basisLine(m, data.server);
+    basisEl.hidden = false;
+    againBtn.hidden = false;
+    if (m.bottom) { sound.flop(); shake(booth, "shake-big"); }
+    else if (m.zone === "green") sound.good();
+    else if (m.zone === "yellow") sound.meh();
+    else sound.bad();
+  }
+
+  // ---------- fairground lights ----------
+  function buildMarquee() {
+    const g = $("marquee-bulbs"), x0 = 18, x1 = 622, y0 = 18, y1 = 182, w = x1 - x0, h = y1 - y0;
+    const per = 2 * (w + h), n = Math.round(per / 27);
+    for (let i = 0; i < n; i++) {
+      let d = (i * per) / n, x, y;
+      if (d < w) { x = x0 + d; y = y0; }
+      else if ((d -= w) < h) { x = x1; y = y0 + d; }
+      else if ((d -= h) < w) { x = x1 - d; y = y1; }
+      else { x = x0; y = y1 - (d - w); }
+      g.appendChild(svg("circle", { cx: x.toFixed(1), cy: y.toFixed(1), r: 5.5, class: i % 2 ? "bulb odd" : "bulb even" }));
+    }
+  }
+  function buildTowerLamps() {
+    const g = $("tower-bulbs"), step = (FLOOR - TOP) / 28;
+    for (let k = 0; k < 28; k++) {
+      const y = FLOOR - (k + 0.5) * step, zone = y > yOf(0.25) ? "red" : y > yOf(0.75) ? "yellow" : "green";
+      for (const x of [248, 312]) {
+        const lamp = svg("g", { class: "tb " + zone });
+        lamp.appendChild(svg("circle", { class: "halo", cx: x, cy: y.toFixed(1), r: 15, fill: `url(#halo-${zone})` }));
+        lamp.appendChild(svg("circle", { class: "glass", cx: x, cy: y.toFixed(1), r: 5.5 }));
+        g.appendChild(lamp);
+        lamps.push({ el: lamp, y, on: false });
+      }
+    }
+  }
+  function buildWheel() {
+    const g = $("wheel-parts");
+    for (let i = 0; i < 16; i++) {
+      const a = (i / 16) * 2 * Math.PI, c = Math.cos(a), s = Math.sin(a);
+      g.appendChild(svg("line", { class: "wheel-line", x1: 300, y1: 300, x2: (300 + 270 * c).toFixed(1), y2: (300 + 270 * s).toFixed(1), "stroke-width": 3 }));
+      g.appendChild(svg("circle", { class: "wheel-cab", cx: (300 + 292 * c).toFixed(1), cy: (300 + 292 * s).toFixed(1), r: 15 }));
+    }
+    for (let i = 0; i < 48; i++) {
+      const a = (i / 48) * 2 * Math.PI;
+      g.appendChild(svg("circle", { class: "wheel-light", cx: (300 + 257 * Math.cos(a)).toFixed(1), cy: (300 + 257 * Math.sin(a)).toFixed(1), r: 3.5 }));
+    }
+  }
+
+  // ---------- wiring ----------
+  const hintText = matchMedia("(hover: hover) and (pointer: fine)").matches
+    ? "Click the striker or press <kbd>Space</kbd> to swing"
+    : "Tap the striker to swing";
+  hintEl.innerHTML = hintText;
+  function paintSound() {
+    soundBtn.textContent = sound.on ? "Sound on" : "Sound off";
+    soundBtn.setAttribute("aria-pressed", String(sound.on));
+  }
+  tower.addEventListener("click", swing);
+  againBtn.addEventListener("click", swing);
+  $("change").addEventListener("click", () => chooseGuild(guild));
+  $("change-guild").addEventListener("click", showGuilds);
+  retryBtn.addEventListener("click", load);
+  soundBtn.addEventListener("click", () => { sound.on = !sound.on; paintSound(); });
+  document.addEventListener("keydown", (e) => {
+    if (e.code !== "Space" || e.repeat || booth.dataset.mode !== "play") return;
+    if (e.target.closest && e.target.closest("button, a, input, select, textarea")) return; // focused controls handle Space themselves
+    e.preventDefault();
+    swing();
+  });
+
+  buildMarquee();
+  buildTowerLamps();
+  buildWheel();
+  paintSound();
+  // A shared link (?guild=…&name=…) goes straight to that striker; everyone else starts at the guild list.
+  const q = new URLSearchParams(location.search), askedGuild = q.get("guild"), askedName = q.get("name");
+  function route() {
+    const g = (askedGuild && guildOf(askedGuild)) || (askedName && guildWith(askedName));
+    if (!g) return false;
+    chooseGuild(g.key);
+    if (askedName && memberOf(g.key, askedName)) choose(askedName);
+    return true;
+  }
+  load();
+})();
+</script>
+</body>
+</html>
